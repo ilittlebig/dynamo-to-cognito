@@ -3,6 +3,8 @@ This project was developed to provide practical experience with Amazon Web Servi
 
 The project was designed with a focus on using industry-standard practices for naming and coding styles. This approach has made the code clean, straightforward, and easy to understand, much like what you would expect in a professional setting.
 
+It features a sign in page, a sign up page, and a dashboard page with a log out button. The sign in page, and sign up page has proper form validation. The pages are also fully responsive.
+
 ## Lambda Function
 AWS Cognito uses AWS Lambda, which is a serverless compute service for running code without having to manage servers. Every time someone attempts to log in, the system first checks if the user is in the user pool. If the user is not found, it triggers the `UserMigration_Authentication` trigger to search for the user in the old database, and if the user is located, it then compares the plain text password entered by the user with the saved hashed password. After authenticating the user, it returns a successful event, and a user is created in the user pool with an encrypted password. 
 

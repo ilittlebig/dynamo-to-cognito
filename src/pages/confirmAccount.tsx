@@ -1,26 +1,26 @@
-import { signUp } from "src/services/authService";
+import { signIn } from "src/services/authService";
 import { FormData } from "src/types/formTypes";
 import useAuthRedirect from "src/hooks/useAuthRedirect";
 import AuthForm from "src/components/authForm";
 
-const SignUp = () => {
+const ConfirmAccount = () => {
   useAuthRedirect("/dashboard");
 
   const submitForm = async (formData: FormData) => {
-    await signUp(formData.email, formData.password);
+    await signIn(formData.email, formData.password);
   }
 
   return (
     <div className="auth-form-container">
       <AuthForm
-        formType="signUp"
-	title="Create An Account"
-	description="Complete your registration for a 10% discount"
-	navigateTo="/confirm-account"
+        formType="confirmAccount"
+	title="Confirm your Account"
+	description="Please enter the code sent to blah blah email."
+	navigateTo="/dashboard"
 	submitForm={submitForm}
       />
     </div>
   )
 }
 
-export default SignUp;
+export default ConfirmAccount;

@@ -13,7 +13,7 @@ const useAuthRedirect = (navigateTo: string) => {
 
   useEffect(() => {
     redirectAuthenticatedUser();
-  }, [navigate]);
+  }, [navigate, redirectAuthenticatedUser]);
 }
 
 export default useAuthRedirect;

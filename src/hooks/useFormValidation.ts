@@ -1,79 +1,86 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import {
+  FormErrors,
+  FormData,
+  FormValidationProps,
+  ValidationRules 
+} from "src/types/formTypes";
+import { fieldValidations } from "src/validations/formValidations";
 
-interface FormErrors {
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  other?: string;
-}
+const useFormValidation = (formType: string, {
+  errors,
+  setErrors,
+  setFormValid,
+  formData
+}: FormValidationProps) => {
+  const validationRules: ValidationRules = {
+    signIn: {
+      email: fieldValidations.nonEmpty,
+      password: fieldValidations.nonEmpty
+    },
+    signUp: {
+      email: fieldValidations.email,
+      password: fieldValidations.password,
+      confirmPassword: fieldValidations.confirmPassword,
+    },
+    confirmAccount: {
+      verificationCode: fieldValidations.verificationCode,
+    },
+  };
 
-export interface FormData {
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-const useFormValidation = (isSignUp: boolean) => {
-  const [errors, setErrors] = useState<FormErrors>({});
+  /* Returns a boolean if the entire form is valid */
 
   const isFormValid = (formData: FormData) => {
-    for (const key of Object.keys(formData) as Array<keyof FormData>) {
-      if (!formData[key].trim()) return false;
+    const rules = validationRules[formType];
+    if (!rules) {
+      throw new Error(`No validation rules defined for form type: ${formType}`);
     }
-    return !Object.values(errors).some(error => error);
+
+    for (const [field, validationFunction] of Object.entries(rules)) {
+      const value = formData[field];
+      const errorMessage = validationFunction(value, formData);
+      if (errorMessage) return false;
+    }
+    return true;
   }
 
-  const validatePassword = (password: string) => {
-    const conditions = {
-      minLength: password.length >= 8,
-      number: /\d/.test(password),
-      specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-      uppercase: /[A-Z]/.test(password),
-      lowercase: /[a-z]/.test(password)
-    };
-    return Object.values(conditions).every(condition => condition);
-  }
+  /* Validates a single field */
 
   const validateField = (fieldId: keyof FormData, value: string, formData: FormData) => {
-    let tempErrors: FormErrors = { ...errors };
+    const tempErrors: FormErrors = { ...errors };
+    const formRules = validationRules[formType];
+    if (!formRules) return;
 
-    const emptyField = !value.trim();
-    tempErrors[fieldId] = emptyField ?
-      `${fieldId[0].toUpperCase() + fieldId.slice(1)} is required` : undefined;
-
-    const isFieldPassword =
-      fieldId === "password" ||
-      fieldId === "confirmPassword";
-
-    if (isSignUp && isFieldPassword) {
-      const isValidPassword = validatePassword(formData.password);
-      tempErrors.password = !isValidPassword ?
-	"Password does not meet requirements" : undefined;
-
-      tempErrors.confirmPassword =
-	formData.password !== formData.confirmPassword ?
-	"Passwords do not match" : undefined
+    const validationFunction = formRules[fieldId];
+    if (validationFunction) {
+      tempErrors[fieldId] = validationFunction(value, formData)
     }
 
-    if (isSignUp && fieldId === "email") {
-      const isValidEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email);
-      tempErrors.email = !isValidEmail ?
-	"Invalid email format" : undefined;
+    if (fieldId === "password" || fieldId === "confirmPassword") {
+      const confirmPasswordValidation = formRules.confirmPassword;
+      if (confirmPasswordValidation) {
+	tempErrors.confirmPassword = confirmPasswordValidation(formData.confirmPassword, formData);
+      }
     }
     setErrors(tempErrors);
   }
+
+  /* Validates all fields at the same time */
 
   const validateForm = (formData: FormData) => {
     let tempErrors: FormErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       validateField(key as keyof FormData, formData[key as keyof FormData], formData);
     });
-
     setErrors(tempErrors);
-    return !Object.values(tempErrors).some(error => error);
   }
 
-  return { validateField, validateForm, errors, isFormValid };
+  useEffect(() => {
+    const isValid = isFormValid(formData);
+    setFormValid(isValid);
+  }, [formData]);
+
+  return { validateField, validateForm, isFormValid, errors };
 }
 
 export default useFormValidation;

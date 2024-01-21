@@ -1,19 +1,17 @@
-import { ComponentType } from "react";
+import { ReactNode } from "react";
 import { Navigate } from 'react-router-dom';
 import { getCurrentUser } from "src/services/authService";
 
 interface ProtectedRouteProps {
-  component: ComponentType<any>;
-  path?: string;
+  component: ReactNode;
 }
 
-const ProtectedRoute = ({ component: Component, ...rest }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ component }: ProtectedRouteProps) => {
   const isAuthenticated = getCurrentUser();
-  console.log(getCurrentUser());
   if (!isAuthenticated) {
     return <Navigate to="/sign-in" replace />;
   }
-  return <Component {...rest} />;
+  return <>{component}</>
 };
 
 export default ProtectedRoute;

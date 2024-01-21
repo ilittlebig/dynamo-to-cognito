@@ -110,17 +110,13 @@ li {
   gap: 16px;
 }
 
-.auth-form__button-container {
-  gap: 16px;
-}
-
 .auth-form__error {
   color: var(--RED-COLOR);
 }
 
 .auth-form__error--api {
   background-color: #FFCCCC;
-  padding: 32px 16px;
+  padding: 16px 16px;
   border-radius: 0.375rem;
 }
 

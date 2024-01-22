@@ -4,8 +4,8 @@ import {
   FormContextType,
   FormProviderProps 
 } from "src/types/formTypes";
+import { formInitialState } from "src/configs/formConfig";
 import useFormValidation from "src/hooks/useFormValidation";
-import useFormState from "src/hooks/useFormState";
 
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
@@ -13,29 +13,27 @@ export const FormProvider = ({ children, formType }: FormProviderProps) => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [formValid, setFormValid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    verificationCode: ""
-  });
+  const [formData, setFormData] = useState(formInitialState);
 
   /* Dependencies are explicitly passed to ensure modularity and reduce
      tight coupling between state management and validation logic */
-  const {
-    validateField,
-    isFormValid
-  } = useFormValidation(formType, { errors, setErrors, setFormValid, formData });
-  const { handleChange } = useFormState({ validateField, isFormValid, setLoading, formData, setFormData });
+  const { validateField } = useFormValidation(formType, {
+    errors,
+    setErrors,
+    setFormValid,
+    formData
+  });
 
   return (
     <FormContext.Provider value={{
-      handleChange,
+      validateField,
       loading,
       setLoading,
       formData,
+      setFormData,
       errors,
-      formValid
+      formValid,
+      setFormValid
     }}>
       {children}
     </FormContext.Provider>

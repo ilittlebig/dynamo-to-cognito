@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormContext } from "src/contexts/formContext";
-import { AuthFormProps } from "src/types/formTypes";
+import { AuthFormProps, FormData } from "src/types/formTypes";
 import { fieldLabels, formConfig } from "src/configs/formConfig";
 
 import InputField from "src/components/inputField";
@@ -15,35 +15,52 @@ const AuthForm = ({
   submitForm,
   navigateTo
 }: AuthFormProps) => {
+  const navigate = useNavigate();
+  const form = formConfig[formType];
+  const { message, linkText, linkTo, linkClick } = form.CTA;
+
   // Errors from AWS Cognito API
   const [generalError, setGeneralError] = useState("");
-  const navigate = useNavigate();
-
-  const form = formConfig[formType];
-  const cta = form.CTA;
-  const ctaMessage = cta.message;
-  const ctaLinkText = cta.linkText;
-  const ctaLinkTo = cta.linkTo;
 
   const {
-    handleChange,
+    validateField,
     loading,
     setLoading,
     formData,
+    setFormData,
     errors,
-    formValid
+    formValid,
+    setFormValid
   } = useFormContext();
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = event.target;
+    const field = id as keyof FormData;
+
+    const updatedFormData = { ...formData, [field]: value }
+    setFormData(updatedFormData);
+    validateField(field, value, updatedFormData);
+  }
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
       await submitForm(formData);
       navigate(navigateTo);
+
+      // Reset state when navigating to new page
+      setFormValid(false);
     } catch (error: any) {
       setGeneralError(error.message);
     } finally {
       setLoading(false);
     }
+  }
+
+  /* Handles the CTA under the button */
+  const handleCTALink = () => {
+    if (!linkClick) return;
+    linkClick(formData);
   }
 
   return (
@@ -88,7 +105,12 @@ const AuthForm = ({
       />
 
       <p className="auth-form__CTA">
-	{ctaMessage && ctaMessage} <a className="auth-form__CTA__Button" href={ctaLinkTo}>{ctaLinkText}</a>
+	{message && message}
+	<span role="button" onClick={handleCTALink}>
+	  <a className="auth-form__CTA__Button" href={linkTo}>
+	    {linkText}
+	  </a>
+	</span>
       </p>
     </form>
   )

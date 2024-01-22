@@ -1,46 +1,21 @@
-interface FieldLabel {
-  label: string;
-  type: string;
-}
+import { FormData, FormConfig, FieldLabels } from "src/types/formTypes";
+import { resendConfirmationCode } from "src/services/authService";
 
-interface FieldLabels {
-  [key: string]: FieldLabel;
-}
-
-type CTAConfig = {
-  message: string | null;
-  linkText: string | null;
-  linkTo: string;
-}
-
-interface FormTypeConfig {
-  fields: string[];
-  showPasswordRequirements: boolean;
-  CTA: CTAConfig;
-}
-
-interface FormConfig {
-  [key: string]: FormTypeConfig;
-}
+export const formInitialState: FormData = {
+  email: "",
+  password: "",
+  confirmPassword: "",
+  verificationCode: ""
+};
 
 export const fieldLabels: FieldLabels = {
-  email: {
-    label: "Email",
-    type: "text"
-  },
-  password: {
-    label: "Password",
-    type: "password"
-  },
-  confirmPassword: {
-    label: "Confirm Password",
-    type: "password"
-  },
-  verificationCode: {
-    label: "Verification Code",
-    type: "text"
-  },
+  email: { label: "Email", type: "email" },
+  password: { label: "Password", type: "password" },
+  confirmPassword: { label: "Confirm Password", type: "password" },
+  verificationCode: { label: "Verification Code", type: "text" },
 };
+
+/* Determines what fields to show on each form page */
 
 export const formConfig: FormConfig = {
   signIn: {
@@ -56,7 +31,6 @@ export const formConfig: FormConfig = {
     fields: ["email", "password", "confirmPassword"],
     showPasswordRequirements: true,
     CTA: {
-      message: null,
       linkText: "Back to Login",
       linkTo: "/sign-in"
     }
@@ -65,9 +39,9 @@ export const formConfig: FormConfig = {
     fields: ["verificationCode"],
     showPasswordRequirements: false,
     CTA: {
-      message: null,
-      linkText: null,
-      linkTo: "/sign-in"
+      message: "Didn't recieve a code?",
+      linkText: "Send a new code",
+      linkClick: resendConfirmationCode
     }
   },
 };

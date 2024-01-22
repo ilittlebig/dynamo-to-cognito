@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import SignIn from "src/pages/signIn";
 import SignUp from "src/pages/signUp";
 import ConfirmAccount from "src/pages/confirmAccount";
+import ConfirmedAccount from "src/pages/confirmedAccount";
 import Dashboard from "src/pages/dashboard";
 
 interface RouteConfigItem {
@@ -27,6 +28,10 @@ export const routesConfig: RouteConfigItem[] = [
     path: "/confirm-account",
     formType: "confirmAccount",
     element: <ConfirmAccount />
+  },
+  {
+    path: "/confirmed-account",
+    element: <ConfirmedAccount />
   },
   {
     path: "/dashboard",

@@ -17,12 +17,14 @@ export interface FormData {
 }
 
 export interface FormContextType {
+  validateField: (fieldId: keyof FormData, value: string, formData: FormData) => void;
   errors: FormErrors;
   formValid: boolean;
-  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
+  setFormValid: (formValid: boolean) => void;
   formData: FormData;
+  setFormData: (formData: FormData) => void;
 }
 
 export interface FormProviderProps {
@@ -61,4 +63,30 @@ export interface FieldValidations {
 
 export interface ValidationRules {
   [key: string]: FieldValidations;
+}
+
+interface FieldLabel {
+  label: string;
+  type: string;
+}
+
+export interface FieldLabels {
+  [key: string]: FieldLabel;
+}
+
+type CTAConfig = {
+  message?: string;
+  linkText?: string;
+  linkTo?: string;
+  linkClick?: (formData: FormData) => any;
+}
+
+interface FormTypeConfig {
+  fields: string[];
+  showPasswordRequirements: boolean;
+  CTA: CTAConfig;
+}
+
+export interface FormConfig {
+  [key: string]: FormTypeConfig;
 }

@@ -5,6 +5,7 @@ import {
   CognitoUser,
   CognitoUserAttribute,
 } from "amazon-cognito-identity-js";
+import { FormData } from "src/types/formTypes";
 
 const USER_POOL = new CognitoUserPool({
   UserPoolId: process.env.REACT_APP_USER_POOL_ID!,
@@ -17,16 +18,58 @@ export const getCurrentUser = () => {
   return USER_POOL.getCurrentUser();
 }
 
+/* Returns a boolean if the user is logged in */
+
 export const isAuthenticated = () => {
   const user = getCurrentUser();
   if (!user) return null;
 
   return new Promise((resolve, reject) => {
     user.getSession((err: Error | null, session: CognitoUserSession) => {
-      if (err) return reject(err);
+      if (err) {
+	reject(err);
+	return;
+      }
       resolve(session.isValid());
     });
   });
+}
+
+/* Sends a verification code to verify user after
+   registration */
+
+export const resendConfirmationCode = ({ email }: FormData) => {
+  const emptyEmail = !email.trim();
+  if (emptyEmail) return;
+
+  const userData = {
+    Username: email,
+    Pool: USER_POOL
+  };
+
+  const cognitoUser = new CognitoUser(userData);
+  cognitoUser.resendConfirmationCode(() => {});
+}
+
+/* Confirms user registration by validating the provided
+   verification code */
+
+export const confirmRegistration = async (email: string, verificationCode: string) => {
+  const userData = {
+    Username: email,
+    Pool: USER_POOL
+  };
+
+  const cognitoUser = new CognitoUser(userData);
+  return new Promise((resolve, reject) => {
+    cognitoUser.confirmRegistration(verificationCode, true, (err, result) => {
+      if (err) {
+	reject(err);
+	return;
+      }
+      resolve(result);
+    });
+  })
 }
 
 /* Invalidates the identity, access, and refresh tokens
@@ -39,7 +82,8 @@ export const signOut = async () => {
   return new Promise<void>((resolve, reject) => {
     user.getSession((err: Error | null, session: CognitoUserSession) => {
       if (err || !session.isValid()) {
-	return reject("User is not authenticated or session is invalid.");
+	reject("User is not authenticated or session is invalid.");
+	return;
       }
 
       user.globalSignOut({
@@ -89,7 +133,8 @@ export const signUp = async (email: string, password: string) => {
   return new Promise((resolve, reject) => {
     USER_POOL.signUp(email, password, attributeList, [], (err, result) => {
       if (err || !result) {
-	return reject(err);
+	reject(err);
+	return;
       }
       resolve(result.user);
     })

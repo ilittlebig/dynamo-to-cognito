@@ -37,6 +37,11 @@ const useFormValidation = (formType: string, {
     }
 
     for (const [field, validationFunction] of Object.entries(rules)) {
+      if (typeof validationFunction !== "function") {
+	throw new Error(`Missing validation function for the field '${field}' in the '${formType}' form. Ensure that all fields have corresponding validation functions defined in the validation rules.`
+);
+      }
+
       const value = formData[field];
       const errorMessage = validationFunction(value, formData);
       if (errorMessage) return false;

@@ -22,7 +22,7 @@ const App = () => {
 
       return {
 	path: route.path,
-	element: element
+	element: route.formType ? element : route.element
       }
     })
   );

@@ -81,7 +81,7 @@ export const handler = async (event) => {
 
 ## Future Improvements
 - Performance Optimization
-  1. **Implement Debounce for Form Validation**: Currently, validation triggers with each keystroke, which could be optimized. By introducing debounce, we'll validate inputs only after a brief pause in typing, enhancing performance and user experience.
+  1. **Debounce for Form Validation**: Currently, validation triggers with each keystroke, which could be optimized. By introducing debounce, we'll validate inputs only after a brief pause in typing, enhancing performance and user experience.
 - Adding Unit Tests
 - Multi-Factor Authentication
 - Forgot Password

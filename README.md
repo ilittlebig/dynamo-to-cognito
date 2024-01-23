@@ -69,7 +69,8 @@ export const handler = async (event) => {
 - [x] Account Verification
 - [ ] Multi-Factor Authentication
 - [x] Responsive Pages
-
+- [ ] Unit Tests
+      
 ## Technologies Used
 - TypeScript
 - React
